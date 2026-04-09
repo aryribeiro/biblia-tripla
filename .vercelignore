@@ -1,0 +1,10 @@
+json/
+sql/
+xml/
+biblia-master.zip
+bible_aa.db
+bible_acf.db
+bible_nvi.db
+*.log
+.env
+.DS_Store

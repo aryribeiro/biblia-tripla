@@ -33,7 +33,10 @@ async function initDatabase() {
             locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
         });
 
-        const response = await fetch('bible_unified.db');
+        const response = await fetch('/bible_unified.db');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const buffer = await response.arrayBuffer();
         db = new SQL.Database(new Uint8Array(buffer));
         
@@ -106,6 +109,8 @@ function populateBookSelect() {
 
 // Quando seleciona livro
 function onBookChange() {
+    if (!db) return;
+
     const bookId = document.getElementById('bookSelect').value;
     const chapterSelect = document.getElementById('chapterSelect');
     const verseSelect = document.getElementById('verseSelect');
@@ -121,22 +126,28 @@ function onBookChange() {
         return;
     }
 
-    const query = `SELECT DISTINCT chapter FROM verses WHERE book = ? AND version = ? ORDER BY chapter`;
-    const result = db.exec(query, [bookId, currentVersion]);
+    try {
+        const query = `SELECT DISTINCT chapter FROM verses WHERE book = ? AND version = ? ORDER BY chapter`;
+        const result = db.exec(query, [bookId, currentVersion]);
 
-    if (result.length > 0) {
-        result[0].values.forEach(([chapter]) => {
-            const option = document.createElement('option');
-            option.value = chapter;
-            option.textContent = `Capítulo ${chapter}`;
-            chapterSelect.appendChild(option);
-        });
-        chapterSelect.disabled = false;
+        if (result.length > 0) {
+            result[0].values.forEach(([chapter]) => {
+                const option = document.createElement('option');
+                option.value = chapter;
+                option.textContent = `Capítulo ${chapter}`;
+                chapterSelect.appendChild(option);
+            });
+            chapterSelect.disabled = false;
+        }
+    } catch (error) {
+        console.error('Error loading chapters:', error);
     }
 }
 
 // Quando seleciona capítulo
 function onChapterChange() {
+    if (!db) return;
+
     const bookId = document.getElementById('bookSelect').value;
     const chapter = document.getElementById('chapterSelect').value;
     const verseSelect = document.getElementById('verseSelect');
@@ -150,23 +161,32 @@ function onChapterChange() {
         return;
     }
 
-    const query = `SELECT DISTINCT verse FROM verses WHERE book = ? AND chapter = ? AND version = ? ORDER BY verse`;
-    const result = db.exec(query, [bookId, chapter, currentVersion]);
+    try {
+        const query = `SELECT DISTINCT verse FROM verses WHERE book = ? AND chapter = ? AND version = ? ORDER BY verse`;
+        const result = db.exec(query, [bookId, chapter, currentVersion]);
 
-    if (result.length > 0) {
-        result[0].values.forEach(([verse]) => {
-            const option = document.createElement('option');
-            option.value = verse;
-            option.textContent = `Versículo ${verse}`;
-            verseSelect.appendChild(option);
-        });
-        verseSelect.disabled = false;
-        referenceBtn.disabled = false;
+        if (result.length > 0) {
+            result[0].values.forEach(([verse]) => {
+                const option = document.createElement('option');
+                option.value = verse;
+                option.textContent = `Versículo ${verse}`;
+                verseSelect.appendChild(option);
+            });
+            verseSelect.disabled = false;
+            referenceBtn.disabled = false;
+        }
+    } catch (error) {
+        console.error('Error loading verses:', error);
     }
 }
 
 // Busca por palavra/frase
 function searchByWord() {
+    if (!db) {
+        alert('Aguarde o carregamento do banco de dados...');
+        return;
+    }
+
     const searchTerm = document.getElementById('searchInput').value.trim();
     
     if (!searchTerm) {
@@ -177,14 +197,24 @@ function searchByWord() {
     currentSearchTerm = searchTerm;
     showLoading();
 
-    const query = `SELECT book, chapter, verse, text FROM verses WHERE version = ? AND text LIKE ? LIMIT 100`;
-    const result = db.exec(query, [currentVersion, `%${searchTerm}%`]);
-
-    displayResults(result, searchTerm);
+    try {
+        const query = `SELECT book, chapter, verse, text FROM verses WHERE version = ? AND text LIKE ? LIMIT 100`;
+        const result = db.exec(query, [currentVersion, `%${searchTerm}%`]);
+        displayResults(result, searchTerm);
+    } catch (error) {
+        console.error('Search error:', error);
+        hideLoading();
+        alert('Erro ao realizar busca. Tente novamente.');
+    }
 }
 
 // Busca por referência
 function searchByReference() {
+    if (!db) {
+        alert('Aguarde o carregamento do banco de dados...');
+        return;
+    }
+
     const bookId = document.getElementById('bookSelect').value;
     const chapter = document.getElementById('chapterSelect').value;
     const verse = document.getElementById('verseSelect').value;
@@ -197,17 +227,23 @@ function searchByReference() {
     currentSearchTerm = '';
     showLoading();
 
-    let query, params;
-    if (verse) {
-        query = `SELECT book, chapter, verse, text FROM verses WHERE version = ? AND book = ? AND chapter = ? AND verse = ?`;
-        params = [currentVersion, bookId, chapter, verse];
-    } else {
-        query = `SELECT book, chapter, verse, text FROM verses WHERE version = ? AND book = ? AND chapter = ? ORDER BY verse`;
-        params = [currentVersion, bookId, chapter];
-    }
+    try {
+        let query, params;
+        if (verse) {
+            query = `SELECT book, chapter, verse, text FROM verses WHERE version = ? AND book = ? AND chapter = ? AND verse = ?`;
+            params = [currentVersion, bookId, chapter, verse];
+        } else {
+            query = `SELECT book, chapter, verse, text FROM verses WHERE version = ? AND book = ? AND chapter = ? ORDER BY verse`;
+            params = [currentVersion, bookId, chapter];
+        }
 
-    const result = db.exec(query, params);
-    displayResults(result);
+        const result = db.exec(query, params);
+        displayResults(result);
+    } catch (error) {
+        console.error('Reference search error:', error);
+        hideLoading();
+        alert('Erro ao realizar busca. Tente novamente.');
+    }
 }
 
 // Exibir resultados
