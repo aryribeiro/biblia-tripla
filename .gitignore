@@ -1,0 +1,14 @@
+node_modules/
+.vercel/
+.DS_Store
+*.log
+.env
+.env.local
+biblia-master.zip
+url github.txt
+xml/
+sql/
+json/
+bible_aa.db
+bible_nvi.db
+bible_acf.db

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bíblia Tripla - NVI, ACF e AA</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📖 Bíblia Tripla</h1>
+            <select id="versionSelect" class="version-select">
+                <option value="nvi">NVI - Nova Versão Internacional</option>
+                <option value="acf">ACF - Almeida Corrigida Fiel</option>
+                <option value="aa">AA - Almeida Revisada</option>
+            </select>
+        </header>
+
+        <main>
+            <div class="search-container">
+                <div class="tabs">
+                    <button class="tab active" data-tab="word">Palavra/Frase</button>
+                    <button class="tab" data-tab="reference">Livro/Capítulo/Versículo</button>
+                </div>
+
+                <div class="tab-content active" id="wordTab">
+                    <input type="text" id="searchInput" placeholder="Digite uma palavra ou frase..." class="search-input">
+                    <button id="searchBtn" class="btn-primary">Buscar</button>
+                </div>
+
+                <div class="tab-content" id="referenceTab">
+                    <select id="bookSelect" class="select-field">
+                        <option value="">Selecione o livro...</option>
+                    </select>
+                    <select id="chapterSelect" class="select-field" disabled>
+                        <option value="">Selecione o capítulo...</option>
+                    </select>
+                    <select id="verseSelect" class="select-field" disabled>
+                        <option value="">Selecione o versículo...</option>
+                    </select>
+                    <button id="referenceBtn" class="btn-primary" disabled>Buscar</button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading hidden">Carregando...</div>
+            <div id="results" class="results"></div>
+        </main>
+    </div>
+
+    <div id="imageModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Gerar Imagem</h2>
+            <div class="color-picker">
+                <label>Cor de fundo:</label>
+                <div class="color-options">
+                    <button class="color-btn" data-color="#FFFFFF" style="background: #FFFFFF; border: 2px solid #ccc;">Branco</button>
+                    <button class="color-btn" data-color="#000000" style="background: #000000;">Preto</button>
+                    <button class="color-btn" data-color="#1E3A8A" style="background: #1E3A8A;">Azul</button>
+                    <button class="color-btn" data-color="#7C3AED" style="background: #7C3AED;">Roxo</button>
+                    <button class="color-btn" data-color="#059669" style="background: #059669;">Verde</button>
+                    <button class="color-btn" data-color="#DC2626" style="background: #DC2626;">Vermelho</button>
+                </div>
+            </div>
+            <canvas id="imageCanvas" style="display: none;"></canvas>
+            <div id="imagePreview"></div>
+            <div class="modal-actions">
+                <button id="downloadBtn" class="btn-primary">Baixar PNG</button>
+                <button id="copyBtn" class="btn-secondary">Copiar Imagem</button>
+                <button id="whatsappBtn" class="btn-success">Compartilhar WhatsApp</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
