@@ -86,6 +86,15 @@ function setupEventListeners() {
     document.getElementById('versionSelect').addEventListener('change', (e) => {
         currentVersion = e.target.value;
         console.log('Versão alterada para:', currentVersion);
+        
+        // Resetar seleções ao mudar versão
+        document.getElementById('bookSelect').value = '';
+        document.getElementById('chapterSelect').innerHTML = '<option value="">Selecione o capítulo...</option>';
+        document.getElementById('chapterSelect').disabled = true;
+        document.getElementById('verseSelect').innerHTML = '<option value="">Selecione o versículo...</option>';
+        document.getElementById('verseSelect').disabled = true;
+        document.getElementById('referenceBtn').disabled = true;
+        document.getElementById('results').innerHTML = '';
     });
 
     // Search
@@ -189,12 +198,19 @@ function onBookChange() {
 
 // Quando seleciona capítulo
 function onChapterChange() {
-    if (!db) return;
+    console.log('onChapterChange chamado');
+    
+    if (!db) {
+        alert('Aguarde o carregamento do banco de dados...');
+        return;
+    }
 
     const bookId = document.getElementById('bookSelect').value;
     const chapter = document.getElementById('chapterSelect').value;
     const verseSelect = document.getElementById('verseSelect');
     const referenceBtn = document.getElementById('referenceBtn');
+
+    console.log('Capítulo selecionado:', chapter, 'do livro:', bookId);
 
     verseSelect.innerHTML = '<option value="">Todos os versículos</option>';
 
@@ -205,10 +221,13 @@ function onChapterChange() {
     }
 
     try {
-        const query = `SELECT DISTINCT verse FROM verses WHERE book = ? AND chapter = ? AND version = ? ORDER BY verse`;
+        const query = `SELECT DISTINCT verse FROM verses WHERE book_id = ? AND chapter = ? AND version = ? ORDER BY verse`;
+        console.log('Executando query versículos:', query, [bookId, chapter, currentVersion]);
+        
         const result = db.exec(query, [bookId, chapter, currentVersion]);
+        console.log('Versículos encontrados:', result);
 
-        if (result.length > 0) {
+        if (result.length > 0 && result[0].values.length > 0) {
             result[0].values.forEach(([verse]) => {
                 const option = document.createElement('option');
                 option.value = verse;
@@ -220,6 +239,7 @@ function onChapterChange() {
         }
     } catch (error) {
         console.error('Error loading verses:', error);
+        alert('Erro ao carregar versículos: ' + error.message);
     }
 }
 
@@ -355,20 +375,17 @@ function generateImagePreview(bgColor) {
     const ctx = canvas.getContext('2d');
     const { reference, text, highlightTerm } = currentVerseData;
 
-    // Configurações
-    const padding = 40;
-    const maxWidth = 600;
-    const lineHeight = 32;
-    const fontSize = 24;
+    // Configurações melhoradas
+    const padding = 50;
+    const maxWidth = 700;
+    const lineHeight = 45;
+    const fontSize = 28;
+    const fontFamily = 'Georgia, serif';
 
     canvas.width = maxWidth + (padding * 2);
     
-    // Background
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
     // Configurar texto
-    ctx.font = `${fontSize}px Arial, sans-serif`;
+    ctx.font = `${fontSize}px ${fontFamily}`;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
 
@@ -391,35 +408,46 @@ function generateImagePreview(bgColor) {
 
     // Calcular altura total
     const textHeight = lines.length * lineHeight;
-    const referenceHeight = 40;
-    const totalHeight = textHeight + referenceHeight + (padding * 3);
+    const referenceHeight = 60;
+    const totalHeight = textHeight + referenceHeight + (padding * 2) + 40;
     
     canvas.height = totalHeight;
 
-    // Redesenhar background com altura correta
+    // Desenhar background
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Cor do texto baseada no fundo
-    const textColor = isLightColor(bgColor) ? '#000000' : '#FFFFFF';
-    ctx.fillStyle = textColor;
-
+    const textColor = isLightColor(bgColor) ? '#1a1a1a' : '#ffffff';
+    
     // Desenhar texto com destaque
+    ctx.font = `${fontSize}px ${fontFamily}`;
+    ctx.fillStyle = textColor;
+    
     let y = padding;
     lines.forEach(line => {
-        if (highlightTerm) {
-            drawLineWithHighlight(ctx, line, padding, y, highlightTerm, textColor, maxWidth);
+        if (highlightTerm && line.toLowerCase().includes(highlightTerm.toLowerCase())) {
+            drawLineWithHighlight(ctx, line, padding, y, highlightTerm, textColor);
         } else {
             ctx.fillText(line, padding, y);
         }
         y += lineHeight;
     });
 
-    // Desenhar referência
+    // Linha separadora
     y += 20;
-    ctx.font = 'bold 20px Arial, sans-serif';
+    ctx.strokeStyle = textColor;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(padding, y);
+    ctx.lineTo(canvas.width - padding, y);
+    ctx.stroke();
+
+    // Desenhar referência
+    y += 25;
+    ctx.font = `bold 22px ${fontFamily}`;
     ctx.fillStyle = textColor;
-    ctx.fillText(`${reference} - ${currentVersion.toUpperCase()}`, padding, y);
+    ctx.fillText(`${reference} - ${currentVersion}`, padding, y);
 
     // Mostrar preview
     const preview = document.getElementById('imagePreview');
@@ -428,7 +456,7 @@ function generateImagePreview(bgColor) {
 }
 
 // Desenhar linha com destaque
-function drawLineWithHighlight(ctx, line, x, y, highlightTerm, textColor, maxWidth) {
+function drawLineWithHighlight(ctx, line, x, y, highlightTerm, textColor) {
     const regex = new RegExp(`(${highlightTerm})`, 'gi');
     const parts = line.split(regex);
     
@@ -437,8 +465,11 @@ function drawLineWithHighlight(ctx, line, x, y, highlightTerm, textColor, maxWid
         if (part.toLowerCase() === highlightTerm.toLowerCase()) {
             // Desenhar destaque amarelo
             const metrics = ctx.measureText(part);
-            ctx.fillStyle = '#FFFF00';
-            ctx.fillRect(currentX, y, metrics.width, 28);
+            const highlightPadding = 4;
+            
+            ctx.fillStyle = '#FFD700';
+            ctx.fillRect(currentX - highlightPadding, y - 2, metrics.width + (highlightPadding * 2), 35);
+            
             ctx.fillStyle = '#000000';
             ctx.fillText(part, currentX, y);
             currentX += metrics.width;
