@@ -1,4 +1,4 @@
-# 📖 Bíblia Tripla
+<img width="1125" height="568" alt="image" src="https://github.com/user-attachments/assets/45eb9706-0ff8-4a63-866c-289e63e34f17" />
 
 Web app moderno para leitura e busca da Bíblia Sagrada em 3 versões: NVI, ACF e AA.
 
@@ -65,7 +65,7 @@ npm i -g vercel
 vercel login
 
 # Deploy
-cd biblia-web-2
+cd biblia-tripla
 vercel --prod
 ```
 
@@ -89,7 +89,7 @@ git push -u origin main
 ### Opção 3: Via Interface Web
 
 1. Acesse [vercel.com](https://vercel.com)
-2. Arraste a pasta `biblia-web-2` para a área de upload
+2. Arraste a pasta `biblia-tripla` para a área de upload
 3. Deploy instantâneo!
 
 ## 💡 Como Usar
