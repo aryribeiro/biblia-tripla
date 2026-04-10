@@ -2,8 +2,6 @@
 
 Web app moderno para leitura e busca da Bíblia Sagrada em 3 versões: NVI, ACF e AA.
 
-🌐 **[Acesse o App](https://biblia-tripla.vercel.app/)**
-
 ## 🚀 Funcionalidades
 
 ### 🔍 Busca Avançada
