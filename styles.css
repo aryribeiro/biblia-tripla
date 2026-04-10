@@ -24,6 +24,30 @@ body {
     line-height: 1.6;
 }
 
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark);
+}
+
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) var(--bg);
+}
+
 .container {
     max-width: 900px;
     margin: 0 auto;
@@ -244,7 +268,7 @@ header h1 {
 
 .btn-generate {
     padding: 8px 16px;
-    background: var(--success);
+    background: var(--primary);
     color: var(--white);
     border: none;
     border-radius: 6px;
@@ -254,7 +278,7 @@ header h1 {
 }
 
 .btn-generate:hover {
-    background: #059669;
+    background: var(--primary-dark);
 }
 
 .modal {
