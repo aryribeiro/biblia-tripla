@@ -55,6 +55,30 @@ header h1 {
     border-color: var(--primary);
 }
 
+.db-status {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.db-status.loading {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.db-status.ready {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.db-status.error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
 .search-container {
     background: var(--white);
     padding: 25px;

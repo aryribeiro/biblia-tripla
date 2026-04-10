@@ -21,7 +21,23 @@ const bookNames = {
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', async () => {
+    const dbStatus = document.getElementById('dbStatus');
+    dbStatus.textContent = '⏳ Carregando banco de dados...';
+    dbStatus.className = 'db-status loading';
+    
     await initDatabase();
+    
+    if (db) {
+        dbStatus.textContent = '✅ Banco carregado com sucesso!';
+        dbStatus.className = 'db-status ready';
+        setTimeout(() => {
+            dbStatus.style.display = 'none';
+        }, 3000);
+    } else {
+        dbStatus.textContent = '❌ Erro ao carregar banco';
+        dbStatus.className = 'db-status error';
+    }
+    
     setupEventListeners();
     populateBookSelect();
 });
@@ -29,21 +45,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Inicializar banco de dados SQLite
 async function initDatabase() {
     try {
+        console.log('Iniciando carregamento do banco de dados...');
         const SQL = await initSqlJs({
             locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
         });
 
+        console.log('sql.js carregado, baixando bible_unified.db (23MB)...');
         const response = await fetch('/bible_unified.db');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        console.log('Banco baixado, carregando na memória...');
         const buffer = await response.arrayBuffer();
         db = new SQL.Database(new Uint8Array(buffer));
         
-        console.log('Database loaded successfully');
+        console.log('✅ Database loaded successfully');
+        
+        // Testar query
+        const test = db.exec('SELECT COUNT(*) FROM verses');
+        console.log('📊 Total de versículos:', test[0].values[0][0]);
+        
+        return true;
+        
     } catch (error) {
-        console.error('Error loading database:', error);
-        alert('Erro ao carregar o banco de dados. Verifique se o arquivo bible_unified.db está disponível.');
+        console.error('❌ Error loading database:', error);
+        alert('Erro ao carregar o banco de dados: ' + error.message);
+        return false;
     }
 }
 
@@ -109,9 +137,16 @@ function populateBookSelect() {
 
 // Quando seleciona livro
 function onBookChange() {
-    if (!db) return;
+    console.log('onBookChange chamado, db:', db ? 'carregado' : 'não carregado');
+    
+    if (!db) {
+        alert('Aguarde o carregamento do banco de dados...');
+        return;
+    }
 
     const bookId = document.getElementById('bookSelect').value;
+    console.log('Livro selecionado:', bookId);
+    
     const chapterSelect = document.getElementById('chapterSelect');
     const verseSelect = document.getElementById('verseSelect');
     const referenceBtn = document.getElementById('referenceBtn');
@@ -128,9 +163,13 @@ function onBookChange() {
 
     try {
         const query = `SELECT DISTINCT chapter FROM verses WHERE book = ? AND version = ? ORDER BY chapter`;
+        console.log('Executando query:', query, 'com parâmetros:', [bookId, currentVersion]);
+        
         const result = db.exec(query, [bookId, currentVersion]);
+        console.log('Resultado da query:', result);
 
-        if (result.length > 0) {
+        if (result.length > 0 && result[0].values.length > 0) {
+            console.log('Capítulos encontrados:', result[0].values.length);
             result[0].values.forEach(([chapter]) => {
                 const option = document.createElement('option');
                 option.value = chapter;
@@ -138,9 +177,12 @@ function onBookChange() {
                 chapterSelect.appendChild(option);
             });
             chapterSelect.disabled = false;
+        } else {
+            console.log('Nenhum capítulo encontrado');
         }
     } catch (error) {
         console.error('Error loading chapters:', error);
+        alert('Erro ao carregar capítulos: ' + error.message);
     }
 }
 
