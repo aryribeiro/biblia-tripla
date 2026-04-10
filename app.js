@@ -386,21 +386,21 @@ function generateImagePreview(bgColor) {
     const ctx = canvas.getContext('2d');
     const { reference, text, highlightTerm } = currentVerseData;
 
-    // Configurações melhoradas
-    const padding = 50;
-    const maxWidth = 700;
-    const lineHeight = 45;
-    const fontSize = 28;
+    // Configurações de alta qualidade
+    const scale = 2;
+    const padding = 60;
+    const maxWidth = 800;
+    const lineHeight = 50;
+    const fontSize = 32;
     const fontFamily = 'Georgia, serif';
 
-    canvas.width = maxWidth + (padding * 2);
+    canvas.width = (maxWidth + (padding * 2)) * scale;
     
-    // Configurar texto
+    ctx.scale(scale, scale);
     ctx.font = `${fontSize}px ${fontFamily}`;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
 
-    // Quebrar texto em linhas
     const words = text.split(' ');
     const lines = [];
     let currentLine = '';
@@ -417,79 +417,90 @@ function generateImagePreview(bgColor) {
     });
     lines.push(currentLine.trim());
 
-    // Calcular altura total
     const textHeight = lines.length * lineHeight;
-    const referenceHeight = 60;
-    const totalHeight = textHeight + referenceHeight + (padding * 2) + 40;
+    const referenceHeight = 70;
+    const totalHeight = textHeight + referenceHeight + (padding * 2) + 50;
     
-    canvas.height = totalHeight;
+    canvas.height = totalHeight * scale;
 
-    // Desenhar background
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(scale, scale);
+
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Cor do texto baseada no fundo
     const textColor = isLightColor(bgColor) ? '#1a1a1a' : '#ffffff';
     
-    // Desenhar texto com destaque
     ctx.font = `${fontSize}px ${fontFamily}`;
     ctx.fillStyle = textColor;
     
     let y = padding;
     lines.forEach(line => {
         if (highlightTerm && line.toLowerCase().includes(highlightTerm.toLowerCase())) {
-            drawLineWithHighlight(ctx, line, padding, y, highlightTerm, textColor);
+            drawLineWithHighlight(ctx, line, padding, y, highlightTerm, textColor, fontSize);
         } else {
             ctx.fillText(line, padding, y);
         }
         y += lineHeight;
     });
 
-    // Linha separadora
-    y += 20;
+    y += 25;
     ctx.strokeStyle = textColor;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(padding, y);
-    ctx.lineTo(canvas.width - padding, y);
+    ctx.lineTo(maxWidth + padding, y);
     ctx.stroke();
 
-    // Desenhar referência
-    y += 25;
-    ctx.font = `bold 22px ${fontFamily}`;
+    y += 30;
+    ctx.font = `bold 24px ${fontFamily}`;
     ctx.fillStyle = textColor;
     ctx.fillText(`${reference} - ${currentVersion}`, padding, y);
 
-    // Mostrar preview
     const preview = document.getElementById('imagePreview');
-    const img = canvas.toDataURL('image/png');
+    const img = canvas.toDataURL('image/png', 1.0);
     preview.innerHTML = `<img src="${img}" alt="Preview">`;
 }
 
 // Desenhar linha com destaque
-function drawLineWithHighlight(ctx, line, x, y, highlightTerm, textColor) {
-    const regex = new RegExp(`(${highlightTerm})`, 'gi');
+function drawLineWithHighlight(ctx, line, x, y, highlightTerm, textColor, fontSize) {
+    if (!highlightTerm) {
+        ctx.fillText(line, x, y);
+        return;
+    }
+
+    const regex = new RegExp(`(${escapeRegex(highlightTerm)})`, 'gi');
     const parts = line.split(regex);
     
     let currentX = x;
     parts.forEach(part => {
-        if (part.toLowerCase() === highlightTerm.toLowerCase()) {
-            // Desenhar destaque amarelo
+        if (part && part.toLowerCase() === highlightTerm.toLowerCase()) {
             const metrics = ctx.measureText(part);
-            const highlightPadding = 4;
+            const highlightPadding = 6;
+            const highlightHeight = fontSize + 8;
             
             ctx.fillStyle = '#FFD700';
-            ctx.fillRect(currentX - highlightPadding, y - 2, metrics.width + (highlightPadding * 2), 35);
+            ctx.fillRect(
+                currentX - highlightPadding, 
+                y - 4, 
+                metrics.width + (highlightPadding * 2), 
+                highlightHeight
+            );
             
             ctx.fillStyle = '#000000';
             ctx.fillText(part, currentX, y);
+            
             currentX += metrics.width;
             ctx.fillStyle = textColor;
-        } else {
+        } else if (part) {
             ctx.fillText(part, currentX, y);
             currentX += ctx.measureText(part).width;
         }
     });
+}
+
+function escapeRegex(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 // Verificar se cor é clara
@@ -527,9 +538,30 @@ async function copyImage() {
 }
 
 // Compartilhar no WhatsApp
-function shareWhatsApp() {
+async function shareWhatsApp() {
     const { reference, text } = currentVerseData;
-    const message = encodeURIComponent(`${text}\n\n${reference} - ${currentVersion.toUpperCase()}\n\n📖 Bíblia Tripla`);
+    
+    if (navigator.share && navigator.canShare) {
+        try {
+            const canvas = document.getElementById('imageCanvas');
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 1.0));
+            
+            const file = new File([blob], 'biblia-tripla.png', { type: 'image/png' });
+            
+            if (navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: 'Bíblia Tripla',
+                    text: `${text}\n\n${reference} - ${currentVersion}`
+                });
+                return;
+            }
+        } catch (error) {
+            console.log('Compartilhamento de imagem não suportado:', error);
+        }
+    }
+    
+    const message = encodeURIComponent(`${text}\n\n${reference} - ${currentVersion}\n\n📖 Bíblia Tripla\nhttps://biblia-tripla.vercel.app`);
     window.open(`https://wa.me/?text=${message}`, '_blank');
 }
 
