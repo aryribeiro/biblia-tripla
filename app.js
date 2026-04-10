@@ -419,7 +419,8 @@ function generateImagePreview(bgColor) {
 
     const textHeight = lines.length * lineHeight;
     const referenceHeight = 70;
-    const totalHeight = textHeight + referenceHeight + (padding * 2) + 50;
+    const signatureHeight = 40;
+    const totalHeight = textHeight + referenceHeight + signatureHeight + (padding * 2) + 50;
     
     canvas.height = totalHeight * scale;
 
@@ -452,6 +453,16 @@ function generateImagePreview(bgColor) {
     ctx.font = `bold 24px ${fontFamily}`;
     ctx.fillStyle = textColor;
     ctx.fillText(`${reference} - ${currentVersion}`, padding, y);
+
+    // Assinatura no canto inferior direito
+    y += 35;
+    ctx.font = `italic 18px ${fontFamily}`;
+    ctx.textAlign = 'right';
+    ctx.fillStyle = textColor;
+    ctx.globalAlpha = 0.7;
+    ctx.fillText('por Ary Ribeiro', maxWidth + padding, y);
+    ctx.globalAlpha = 1.0;
+    ctx.textAlign = 'left';
 
     const preview = document.getElementById('imagePreview');
     const img = canvas.toDataURL('image/png', 1.0);
@@ -557,7 +568,7 @@ async function shareWhatsApp() {
         }
     }
     
-    const message = encodeURIComponent(`${text}\n\n${reference} - ${currentVersion}\n\n📖 Bíblia Tripla\nhttps://biblia-tripla.vercel.app`);
+    const message = encodeURIComponent(`${text}\n\n${reference} - ${currentVersion}\n\nBíblia Tripla - por Ary Ribeiro\nhttps://biblia-tripla.vercel.app`);
     window.open(`https://wa.me/?text=${message}`, '_blank');
 }
 
