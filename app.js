@@ -291,17 +291,12 @@ function searchByReference() {
     showLoading();
 
     try {
-        let query, params;
-        if (verse) {
-            query = `SELECT book_id, chapter, verse, text FROM verses WHERE version = ? AND book_id = ? AND chapter = ? AND verse = ?`;
-            params = [currentVersion, bookId, chapter, verse];
-        } else {
-            query = `SELECT book_id, chapter, verse, text FROM verses WHERE version = ? AND book_id = ? AND chapter = ? ORDER BY verse`;
-            params = [currentVersion, bookId, chapter];
-        }
+        // SEMPRE buscar o capítulo inteiro
+        const query = `SELECT book_id, chapter, verse, text FROM verses WHERE version = ? AND book_id = ? AND chapter = ? ORDER BY verse`;
+        const params = [currentVersion, bookId, chapter];
 
         const result = db.exec(query, params);
-        displayResults(result);
+        displayResults(result, '', bookId, chapter, verse);
     } catch (error) {
         console.error('Reference search error:', error);
         hideLoading();
@@ -310,7 +305,7 @@ function searchByReference() {
 }
 
 // Exibir resultados
-function displayResults(result, highlightTerm = '') {
+function displayResults(result, highlightTerm = '', bookId = null, chapter = null, highlightVerse = null) {
     hideLoading();
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = '';
@@ -320,15 +315,24 @@ function displayResults(result, highlightTerm = '') {
         return;
     }
 
-    result[0].values.forEach(([bookId, chapter, verse, text]) => {
+    // Container para os versículos
+    const versesContainer = document.createElement('div');
+    versesContainer.className = 'verses-container';
+
+    result[0].values.forEach(([resultBookId, resultChapter, verse, text]) => {
         const card = document.createElement('div');
         card.className = 'verse-card';
+        
+        // Destacar versículo selecionado
+        if (highlightVerse && verse == highlightVerse) {
+            card.classList.add('verse-highlighted');
+        }
 
-        const reference = `${bookNames[bookId]} ${chapter}:${verse}`;
+        const reference = `${bookNames[resultBookId]} ${resultChapter}:${verse}`;
         const highlightedText = highlightTerm ? highlightText(text, highlightTerm) : text;
 
         card.innerHTML = `
-            <div class="verse-reference">${reference} - ${currentVersion.toUpperCase()}</div>
+            <div class="verse-reference">${reference} - ${currentVersion}</div>
             <div class="verse-text">${highlightedText}</div>
             <div class="verse-actions">
                 <button class="btn-generate" onclick="openImageModal('${reference}', \`${text.replace(/`/g, '\\`')}\`, '${highlightTerm}')">
@@ -337,8 +341,15 @@ function displayResults(result, highlightTerm = '') {
             </div>
         `;
 
-        resultsDiv.appendChild(card);
+        versesContainer.appendChild(card);
     });
+
+    resultsDiv.appendChild(versesContainer);
+
+    // Adicionar botões de navegação se for busca por referência
+    if (bookId && chapter) {
+        addNavigationButtons(resultsDiv, bookId, parseInt(chapter));
+    }
 }
 
 // Destacar texto
@@ -530,4 +541,58 @@ function showLoading() {
 
 function hideLoading() {
     document.getElementById('loading').classList.add('hidden');
+}
+
+// Adicionar botões de navegação entre capítulos
+function addNavigationButtons(container, bookId, chapter) {
+    const navDiv = document.createElement('div');
+    navDiv.className = 'chapter-navigation';
+
+    // Verificar se existe capítulo anterior
+    const hasPrevious = chapter > 1;
+    
+    // Verificar se existe próximo capítulo
+    const query = `SELECT DISTINCT chapter FROM verses WHERE book_id = ? AND version = ? ORDER BY chapter`;
+    const result = db.exec(query, [bookId, currentVersion]);
+    const chapters = result[0].values.map(([ch]) => ch);
+    const hasNext = chapters.includes(chapter + 1);
+
+    if (hasPrevious) {
+        const btnPrev = document.createElement('button');
+        btnPrev.className = 'btn-nav btn-prev';
+        btnPrev.innerHTML = '← Capítulo Anterior';
+        btnPrev.onclick = () => navigateToChapter(bookId, chapter - 1);
+        navDiv.appendChild(btnPrev);
+    }
+
+    if (hasNext) {
+        const btnNext = document.createElement('button');
+        btnNext.className = 'btn-nav btn-next';
+        btnNext.innerHTML = 'Próximo Capítulo →';
+        btnNext.onclick = () => navigateToChapter(bookId, chapter + 1);
+        navDiv.appendChild(btnNext);
+    }
+
+    if (hasPrevious || hasNext) {
+        container.appendChild(navDiv);
+    }
+}
+
+// Navegar para capítulo específico
+function navigateToChapter(bookId, chapter) {
+    showLoading();
+    
+    try {
+        const query = `SELECT book_id, chapter, verse, text FROM verses WHERE version = ? AND book_id = ? AND chapter = ? ORDER BY verse`;
+        const result = db.exec(query, [currentVersion, bookId, chapter]);
+        
+        displayResults(result, '', bookId, chapter);
+        
+        // Scroll suave para o topo dos resultados
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (error) {
+        console.error('Navigation error:', error);
+        hideLoading();
+        alert('Erro ao navegar. Tente novamente.');
+    }
 }
