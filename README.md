@@ -2,17 +2,38 @@
 
 Web app moderno para leitura e busca da Bíblia Sagrada em 3 versões: NVI, ACF e AA.
 
+🌐 **[Acesse o App](https://biblia-tripla.vercel.app/)**
+
 ## 🚀 Funcionalidades
 
-- ✅ **3 Versões da Bíblia**: NVI, ACF e AA
-- 🔍 **Busca por Palavra/Frase**: Encontre versículos específicos
-- 📚 **Navegação por Livro/Capítulo/Versículo**: Acesso direto
-- 🖍️ **Destaque Amarelo**: Palavras buscadas destacadas como marca-texto
-- 📷 **Geração de PNG**: Crie imagens personalizadas dos versículos
-- 🎨 **Cores Personalizáveis**: Escolha a cor de fundo da imagem
-- 📱 **Compartilhamento**: WhatsApp, download ou copiar para área de transferência
-- ⚡ **Performance**: SQLite em memória para buscas rápidas
-- 📱 **Responsivo**: Funciona perfeitamente em mobile e desktop
+### 🔍 Busca Avançada
+- ✅ **Busca por Palavra/Frase**: Encontre versículos específicos com destaque amarelo
+- ✅ **Busca Direta**: Navegue por Livro → Capítulo → Versículo
+- ✅ **Capítulo Completo**: Sempre exibe o capítulo inteiro na busca direta
+- ✅ **Destaque de Versículo**: Versículo selecionado aparece destacado em azul
+
+### 📚 Navegação Inteligente
+- ⬅️ **Botão Voltar**: Navega para o capítulo anterior (canto inferior esquerdo)
+- ➡️ **Botão Avançar**: Navega para o próximo capítulo (canto inferior direito)
+- 🔄 **Troca de Versão**: Reseta automaticamente as seleções ao mudar de versão
+- 📜 **3 Versões**: NVI, ACF e AA disponíveis
+
+### 📸 Geração de Imagens (Alta Qualidade)
+- 🎨 **6 Cores de Fundo**: Branco, Preto, Azul, Roxo, Verde, Vermelho
+- 📷 **Resolução 2x**: Imagens em alta qualidade para compartilhamento
+- ✍️ **Fonte Elegante**: Georgia com espaçamento otimizado
+- 📝 **Assinatura**: "por Ary Ribeiro" em itálico no canto inferior direito
+- 📊 **Layout Profissional**: Linha separadora e referência completa
+
+### 📤 Compartilhamento
+- 📱 **WhatsApp**: Compartilha texto formatado com link do app
+- 💾 **Download PNG**: Salva imagem em alta resolução
+- 📋 **Copiar Imagem**: Cola diretamente em qualquer aplicativo
+
+### ⚡ Performance
+- 💾 **SQLite em Memória**: Banco de 23MB carregado para buscas instantâneas
+- 🔍 **93.315 versículos**: Acesso rápido a todo conteúdo bíblico
+- 📱 **Responsivo**: Design mobile-first, funciona perfeitamente em todos os dispositivos
 
 ## 🛠️ Tecnologias
 
@@ -24,13 +45,15 @@ Web app moderno para leitura e busca da Bíblia Sagrada em 3 versões: NVI, ACF 
 ## 📦 Estrutura do Projeto
 
 ```
-biblia-web-2/
-├── index.html          # Estrutura HTML
-├── styles.css          # Estilos responsivos
-├── app.js              # Lógica JavaScript
-├── vercel.json         # Configuração Vercel
-├── bible_unified.db    # Banco SQLite unificado
-└── README.md           # Documentação
+biblia-tripla/
+├── index.html          # Estrutura HTML com tabs e modal
+├── styles.css          # Design responsivo e moderno
+├── app.js              # Lógica completa (busca, navegação, geração de imagem)
+├── vercel.json         # Configuração otimizada para Vercel
+├── bible_unified.db    # Banco SQLite unificado (23MB, 93.315 versículos)
+├── .gitignore          # Arquivos ignorados
+├── .vercelignore       # Arquivos excluídos do deploy
+└── README.md           # Documentação completa
 ```
 
 ## 🚀 Deploy na Vercel
@@ -74,25 +97,36 @@ git push -u origin main
 
 ## 💡 Como Usar
 
-### Busca por Palavra/Frase
+### 🔍 Busca por Palavra/Frase
 1. Selecione a versão da Bíblia (NVI, ACF ou AA)
 2. Digite uma palavra ou frase na aba "Palavra/Frase"
 3. Clique em "Buscar"
-4. Palavras encontradas serão destacadas em amarelo
+4. Palavras encontradas serão destacadas em amarelo nos resultados
+5. Limite de 100 resultados por busca
 
-### Busca por Referência
+### 📚 Busca Direta (Livro/Capítulo/Versículo)
 1. Selecione a versão da Bíblia
 2. Vá para a aba "Livro/Capítulo/Versículo"
-3. Escolha o livro, capítulo e versículo (opcional)
-4. Clique em "Buscar"
+3. Escolha o livro (66 livros disponíveis)
+4. Escolha o capítulo
+5. (Opcional) Escolha um versículo específico
+6. Clique em "Buscar"
+7. **O capítulo inteiro será exibido** (versículo selecionado destacado em azul)
+8. Use os botões "← Capítulo Anterior" e "Próximo Capítulo →" para navegar
 
-### Gerar Imagem
+### 📸 Gerar Imagem de Versículo
 1. Após encontrar um versículo, clique em "📷 Gerar Imagem"
-2. Escolha a cor de fundo desejada
-3. Opções disponíveis:
-   - **Baixar PNG**: Download direto
+2. Escolha a cor de fundo desejada (6 opções)
+3. Visualize o preview da imagem
+4. Opções disponíveis:
+   - **Baixar PNG**: Download em alta resolução (2x)
    - **Copiar Imagem**: Cola em qualquer aplicativo
-   - **Compartilhar WhatsApp**: Envia o texto via WhatsApp
+   - **Compartilhar WhatsApp**: Envia texto formatado com link
+
+### 🔄 Trocar Versão da Bíblia
+- Ao trocar de versão, todas as seleções são resetadas automaticamente
+- Resultados anteriores são limpos
+- Faça uma nova busca com a versão selecionada
 
 ## 🎨 Personalização
 
@@ -118,16 +152,19 @@ Edite o arquivo `styles.css`:
 
 ## 📊 Estrutura do Banco de Dados
 
-O arquivo `bible_unified.db` contém:
+O arquivo `bible_unified.db` (23MB) contém:
 
-**Tabela: verses**
-- `id`: Identificador único
-- `version`: Versão (nvi, acf, aa)
-- `testament`: Testamento (1=Velho, 2=Novo)
-- `book`: ID do livro (1-66)
-- `chapter`: Número do capítulo
-- `verse`: Número do versículo
-- `text`: Texto do versículo
+**Tabela: verses** (93.315 registros)
+- `id`: Identificador único (INTEGER PRIMARY KEY)
+- `version`: Versão (TEXT: 'NVI', 'ACF', 'AA')
+- `book_id`: ID do livro (INTEGER: 1-66)
+- `chapter`: Número do capítulo (INTEGER)
+- `verse`: Número do versículo (INTEGER)
+- `text`: Texto do versículo (TEXT)
+
+**Tabelas auxiliares:**
+- `testament`: Informações sobre Velho e Novo Testamento
+- `books`: Nomes e metadados dos 66 livros bíblicos
 
 ## 🔧 Desenvolvimento Local
 
@@ -147,11 +184,20 @@ Acesse: `http://localhost:8000`
 ## ⚠️ Requisitos
 
 - Navegador moderno com suporte a:
-  - ES6+
-  - Canvas API
-  - Clipboard API
-  - Fetch API
-  - WebAssembly (para sql.js)
+  - ES6+ (Arrow Functions, Async/Await, Template Literals)
+  - Canvas API (geração de imagens)
+  - Clipboard API (copiar imagem)
+  - Fetch API (carregar banco de dados)
+  - WebAssembly (sql.js para SQLite no browser)
+- Conexão com internet (para carregar sql.js via CDN e banco de dados)
+
+## 🚀 Performance
+
+- **Carregamento inicial**: ~3-5 segundos (download do banco de 23MB)
+- **Buscas**: Instantâneas (SQLite em memória)
+- **Geração de imagem**: < 1 segundo
+- **Navegação entre capítulos**: Instantânea
+- **Tamanho total do app**: ~25MB (HTML + CSS + JS + DB)
 
 ## 📚 Fonte dos Dados
 

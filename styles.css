@@ -407,7 +407,7 @@ header h1 {
 
 footer {
     text-align: center;
-    padding: 30px 20px;
+    padding: 18px 20px;
     margin-top: 50px;
     border-top: 2px solid var(--border);
     background: var(--white);
@@ -423,7 +423,6 @@ footer p {
 footer a {
     color: var(--primary);
     text-decoration: none;
-    font-weight: 600;
     transition: color 0.3s;
 }
 
@@ -433,7 +432,8 @@ footer a:hover {
 }
 
 footer strong {
-    color: var(--text);
+    color: var(--primary);
+    font-weight: 600;
 }
 
 @media (max-width: 768px) {
