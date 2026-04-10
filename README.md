@@ -22,7 +22,6 @@ Web app moderno para leitura e busca da Bíblia Sagrada em 3 versões: NVI, ACF 
 - 🎨 **6 Cores de Fundo**: Branco, Preto, Azul, Roxo, Verde, Vermelho
 - 📷 **Resolução 2x**: Imagens em alta qualidade para compartilhamento
 - ✍️ **Fonte Elegante**: Georgia com espaçamento otimizado
-- 📝 **Assinatura**: "por Ary Ribeiro" em itálico no canto inferior direito
 - 📊 **Layout Profissional**: Linha separadora e referência completa
 
 ### 📤 Compartilhamento

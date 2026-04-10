@@ -335,11 +335,20 @@ function displayResults(result, highlightTerm = '', bookId = null, chapter = nul
             <div class="verse-reference">${reference} - ${currentVersion}</div>
             <div class="verse-text">${highlightedText}</div>
             <div class="verse-actions">
-                <button class="btn-generate" onclick="openImageModal('${reference}', \`${text.replace(/`/g, '\\`')}\`, '${highlightTerm}')">
+                <button class="btn-generate" data-reference="${reference}" data-text="${encodeURIComponent(text)}" data-highlight="${highlightTerm}">
                     📷 Gerar Imagem
                 </button>
             </div>
         `;
+
+        // Adicionar event listener ao botão
+        const btn = card.querySelector('.btn-generate');
+        btn.addEventListener('click', function() {
+            const ref = this.getAttribute('data-reference');
+            const txt = decodeURIComponent(this.getAttribute('data-text'));
+            const highlight = this.getAttribute('data-highlight');
+            openImageModal(ref, txt, highlight);
+        });
 
         versesContainer.appendChild(card);
     });
