@@ -162,7 +162,7 @@ function onBookChange() {
     }
 
     try {
-        const query = `SELECT DISTINCT chapter FROM verses WHERE book = ? AND version = ? ORDER BY chapter`;
+        const query = `SELECT DISTINCT chapter FROM verses WHERE book_id = ? AND version = ? ORDER BY chapter`;
         console.log('Executando query:', query, 'com parâmetros:', [bookId, currentVersion]);
         
         const result = db.exec(query, [bookId, currentVersion]);
@@ -240,7 +240,7 @@ function searchByWord() {
     showLoading();
 
     try {
-        const query = `SELECT book, chapter, verse, text FROM verses WHERE version = ? AND text LIKE ? LIMIT 100`;
+        const query = `SELECT book_id, chapter, verse, text FROM verses WHERE version = ? AND text LIKE ? LIMIT 100`;
         const result = db.exec(query, [currentVersion, `%${searchTerm}%`]);
         displayResults(result, searchTerm);
     } catch (error) {
@@ -272,10 +272,10 @@ function searchByReference() {
     try {
         let query, params;
         if (verse) {
-            query = `SELECT book, chapter, verse, text FROM verses WHERE version = ? AND book = ? AND chapter = ? AND verse = ?`;
+            query = `SELECT book_id, chapter, verse, text FROM verses WHERE version = ? AND book_id = ? AND chapter = ? AND verse = ?`;
             params = [currentVersion, bookId, chapter, verse];
         } else {
-            query = `SELECT book, chapter, verse, text FROM verses WHERE version = ? AND book = ? AND chapter = ? ORDER BY verse`;
+            query = `SELECT book_id, chapter, verse, text FROM verses WHERE version = ? AND book_id = ? AND chapter = ? ORDER BY verse`;
             params = [currentVersion, bookId, chapter];
         }
 
@@ -299,11 +299,11 @@ function displayResults(result, highlightTerm = '') {
         return;
     }
 
-    result[0].values.forEach(([book, chapter, verse, text]) => {
+    result[0].values.forEach(([bookId, chapter, verse, text]) => {
         const card = document.createElement('div');
         card.className = 'verse-card';
 
-        const reference = `${bookNames[book]} ${chapter}:${verse}`;
+        const reference = `${bookNames[bookId]} ${chapter}:${verse}`;
         const highlightedText = highlightTerm ? highlightText(text, highlightTerm) : text;
 
         card.innerHTML = `
