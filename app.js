@@ -1,5 +1,5 @@
 let db = null;
-let currentVersion = 'nvi';
+let currentVersion = 'NVI';
 let currentSearchTerm = '';
 let currentVerseData = null;
 
@@ -85,6 +85,7 @@ function setupEventListeners() {
     // Version select
     document.getElementById('versionSelect').addEventListener('change', (e) => {
         currentVersion = e.target.value;
+        console.log('Versão alterada para:', currentVersion);
     });
 
     // Search
