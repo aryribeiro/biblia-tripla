@@ -436,11 +436,7 @@ function generateImagePreview(bgColor) {
     
     let y = padding;
     lines.forEach(line => {
-        if (highlightTerm && line.toLowerCase().includes(highlightTerm.toLowerCase())) {
-            drawLineWithHighlight(ctx, line, padding, y, highlightTerm, textColor, fontSize);
-        } else {
-            ctx.fillText(line, padding, y);
-        }
+        ctx.fillText(line, padding, y);
         y += lineHeight;
     });
 

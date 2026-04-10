@@ -405,6 +405,37 @@ header h1 {
     margin-left: auto;
 }
 
+footer {
+    text-align: center;
+    padding: 30px 20px;
+    margin-top: 50px;
+    border-top: 2px solid var(--border);
+    background: var(--white);
+    border-radius: 12px;
+}
+
+footer p {
+    color: var(--text-light);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+footer a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+footer a:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+footer strong {
+    color: var(--text);
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 15px;
