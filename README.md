@@ -1,6 +1,6 @@
 <img width="1125" height="568" alt="image" src="https://github.com/user-attachments/assets/45eb9706-0ff8-4a63-866c-289e63e34f17" />
 
-Web app moderno para leitura e busca da Bíblia Sagrada em 3 versões: NVI, ACF e AA.
+Web app moderno para leitura e busca na Bíblia Sagrada em 3 versões: NVI, ACF e AA.
 
 ## 🚀 Funcionalidades
 
